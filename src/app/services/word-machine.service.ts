@@ -60,12 +60,12 @@ export class WordMachineService {
           }
         }
 
-        if (errorFound) break;
+        if (errorFound) {
+          this.errorString.next(this.error + ` from ${splitStr.join(' ')}`);
+          break
+        };
       }
-      if (errorFound) {
-        this.errorString.next(this.error + ` from ${stringArray}`);
-        break;
-      };
+      if (errorFound) break;
 
       solutions.push(this.results.slice(-1)[0])
       this.results = [];
