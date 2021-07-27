@@ -1,0 +1,7 @@
+<div class="mb-3">
+	<label for="operationsArray" class="form-label">Operations</label>
+	<input type="text" class="form-control" id="operationsArray" [(ngModel)]="operations" placeholder="Enter operations"
+		(keyup.enter)='processOperations()'>
+
+	<button type="button" class="btn mt-3" (click)='processOperations()'>Submit Operations</button>
+</div>

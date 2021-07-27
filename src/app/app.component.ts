@@ -6,5 +6,5 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'word-machine-emulator';
+  title = 'Ensue LLC | Word Machine Emulator';
 }
