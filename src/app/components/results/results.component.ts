@@ -10,7 +10,7 @@ import { WordMachineService } from 'src/app/services/word-machine.service';
 export class ResultsComponent implements OnInit, OnDestroy {
   subs: Subscription[] = [];
   results: number[] = [];
-  error: string = '';
+  errors: string[] = [];
 
   constructor(
     private wordMachineService: WordMachineService
@@ -20,7 +20,7 @@ export class ResultsComponent implements OnInit, OnDestroy {
     this.subs.push(this.wordMachineService.resultsArray.subscribe(arr => {
       this.results = arr
     }));
-    this.subs.push(this.wordMachineService.errorString.subscribe(err => this.error = err));
+    this.subs.push(this.wordMachineService.errorStringArray.subscribe(arr => this.errors = arr));
   }
 
   ngOnDestroy() {

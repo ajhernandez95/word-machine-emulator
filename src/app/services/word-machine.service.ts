@@ -7,10 +7,10 @@ import { Subject } from 'rxjs';
 export class WordMachineService {
   public operationArray: Subject<string[]> = new Subject();
   public resultsArray: Subject<number[]> = new Subject();
-  public errorString: Subject<string> = new Subject();
+  public errorStringArray: Subject<string[]> = new Subject();
 
   results = [];
-  error: string = '';
+  errors: string[] = [];
 
 
 
@@ -25,7 +25,7 @@ export class WordMachineService {
     const solutions = [];
 
     if (stringArray.length == 0) {
-      this.errorString.next('Operations are blank | please enter operations above')
+      this.errorStringArray.next(['Operations are blank | please enter operations above'])
       return;
     }
 
@@ -43,53 +43,54 @@ export class WordMachineService {
         } else {
           switch (splitStr[i2].toLowerCase()) {
             case 'pop':
-              if (!this.handlePop()) errorFound = true;
+              if (!this.handlePop(splitStr.join(' '))) errorFound = true;
               break;
             case 'dup':
-              if (!this.handleDup()) errorFound = true;
+              if (!this.handleDup(splitStr.join(' '))) errorFound = true;
               break;
             case '+':
-              if (!this.handleArithmetic('+')) errorFound = true;
+              if (!this.handleArithmetic('+', splitStr.join(' '))) errorFound = true;
               break;
             case '-':
-              if (!this.handleArithmetic('-')) errorFound = true;
+              if (!this.handleArithmetic('-', splitStr.join(' '))) errorFound = true;
               break;
             default:
-              this.error = `String ${splitStr[i2]} is not a supported operation`;
+              this.errors.push(`String ${splitStr[i2]} is not a supported operation`);
               errorFound = true;
           }
         }
-
-        if (errorFound) {
-          this.errorString.next(this.error + ` from ${splitStr.join(' ')}`);
-          break
-        };
       }
-      if (errorFound) break;
 
-      solutions.push(this.results.slice(-1)[0])
+      if (!errorFound) {
+        if (this.results.slice(-1)[0] != undefined) {
+          solutions.push(`${this.results.slice(-1)[0]} from ${stringArray[i1]}`)
+        } else {
+          solutions.push('empty')
+        }
+      }
+
       this.results = [];
-      this.error = '';
     }
 
+    this.errorStringArray.next(this.errors)
     this.resultsArray.next(solutions)
   }
 
-  private handlePop() {
+  private handlePop(splitStr) {
     const value = this.results.pop();
     if (value == undefined) {
-      this.error = 'No number was available to POP'
+      this.errors.push(`No number was available to POP from ${splitStr}`);
       return false;
     };
 
     return true;
   }
 
-  private handleDup() {
+  private handleDup(splitStr) {
     const value = this.results.slice(-1)[0]
 
     if (value == undefined) {
-      this.error = 'No number was available to DUP';
+      this.errors.push(`No number was available to DUP from ${splitStr}`);
       return false;
     }
 
@@ -97,14 +98,14 @@ export class WordMachineService {
     return true;
   }
 
-  private handleArithmetic(arithmetic: string) {
+  private handleArithmetic(arithmetic: string, splitStr) {
     const values = this.results.splice(-2);
 
     if (values[0] == undefined || values[1] == undefined) {
-      this.error = `Not enough numbers to ${arithmetic == '+' ? 'add' : 'subtract'}`;
+      this.errors.push(`Not enough numbers to ${arithmetic == '+' ? 'add' : 'subtract'} from ${splitStr}`);
       return false;
     } else if (!parseInt(values[0]) || !parseInt(values[1])) {
-      this.error = 'Both values need to be numbers';
+      this.errors.push(`Both values need to be numbers from ${splitStr}`);
       return false;
     } else {
       if (arithmetic == '+') {
@@ -118,7 +119,9 @@ export class WordMachineService {
   }
 
   clearState() {
-    this.errorString.next('');
+    this.errors = [];
+    this.results = [];
+    this.errorStringArray.next([]);
     this.resultsArray.next([]);
     this.operationArray.next([]);
   }
