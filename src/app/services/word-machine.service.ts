@@ -38,7 +38,7 @@ export class WordMachineService {
       let errorFound = false;
 
       for (const i2 in splitStr) {
-        if (parseInt(splitStr[i2])) {
+        if (/^\d+$/.test(splitStr[i2])) {
           this.results.push(splitStr[i2])
         } else {
           switch (splitStr[i2].toLowerCase()) {
@@ -104,7 +104,7 @@ export class WordMachineService {
     if (values[0] == undefined || values[1] == undefined) {
       this.errors.push(`Not enough numbers to ${arithmetic == '+' ? 'add' : 'subtract'} from ${splitStr}`);
       return false;
-    } else if (!parseInt(values[0]) || !parseInt(values[1])) {
+    } else if (!/^\d+$/.test(values[0]) || !/^\d+$/.test(values[1])) {
       this.errors.push(`Both values need to be numbers from ${splitStr}`);
       return false;
     } else {
